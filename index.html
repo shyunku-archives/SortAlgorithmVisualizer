@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>visualize</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="functions.js"></script>
+        <script src="visualize.js"></script>
+    </head>
+    <body>
+        <div class="entire-wrapper">
+            <div class="left-part" id="viz_canvas_wrapper">
+                <canvas id="viz_canvas"></canvas>
+            </div>
+            <div class="right-part">
+                <div class="setting-panel initial-setting">
+                    <span class="panel-title">Initial Setting</span>
+                    <hr>
+                    <div class="control-item">
+                        <span>데이터 수</span>
+                        <input class="numberic-input" id="data_num_input">
+                    </div>
+                    <div class="control-item">
+                        <span>Sort Method</span>
+                        <select id="sort_method_selector">
+                            <option value="bubble">BubbleSort</option>
+                            <option value="selection">SelectionSort</option>
+                            <option value="quick">QuickSort</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <div class="button-wrapper">
+                            <button id="setting_initial_button">적용</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-panel basic-functions">
+                    <span class="panel-title">Basic Controls</span>
+                    <hr>
+                    <div class="button-wrapper">
+                        <button id="shuffle_button">Shuffle</button>
+                    </div>
+                    <div class="button-wrapper">
+                        <button id="play_button">Sort</button>
+                    </div>
+                </div>
+                <div class="setting-panel analyze-panel">
+                    <span class="panel-title">Analyze Panel</span>
+                    <hr>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">데이터 크기</span>
+                        <span class="panel-desc-value" id="data_num_value">200</span>
+                    </div>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">Sort Method</span>
+                        <span class="panel-desc-value" id="sort_method_value">N/A</span>
+                    </div>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">Comparisons</span>
+                        <span class="panel-desc-value" id="comparison_num_value">0</span>
+                    </div>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">Memory Access</span>
+                        <span class="panel-desc-value" id="memory_access_num_value">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
