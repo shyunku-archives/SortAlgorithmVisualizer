@@ -6,6 +6,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="functions.js"></script>
         <script src="visualize.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="entire-wrapper">
@@ -18,7 +19,19 @@
                     <hr>
                     <div class="control-item">
                         <span>데이터 수</span>
-                        <input class="numberic-input" id="data_num_input">
+                        <input class="numberic-input" id="data_num_input" placeholder="100">
+                    </div>
+                    <div class="control-item">
+                        <span>Initial Delay</span>
+                        <input class="numberic-input" id="delay_input" placeholder="0">
+                    </div>
+                    <div class="control-item">
+                        <span>Check Compare/Access</span>
+                        <div class="switcher">
+                            <span class="toggle-switch" id="check_compare_switcher">
+                                <span class="toggle-knob"></span>
+                            </span>
+                        </div>
                     </div>
                     <div class="control-item">
                         <span>Sort Method</span>
@@ -26,11 +39,35 @@
                             <option value="bubble">BubbleSort</option>
                             <option value="selection">SelectionSort</option>
                             <option value="quick">QuickSort</option>
+                            <option value="bogo">BogoSort</option>
+                            <option value="advanced_bogo">AdvancedBogoSort</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <span>Assign Method</span>
+                        <select id="assign_method_selector">
+                            <option value="sorted">Sorted</option>
+                            <option value="reversed">Reversed</option>
+                            <option value="sin_wave">SineWave</option>
+                            <option value="randomly">Randomly</option>
                         </select>
                     </div>
                     <div class="control-item">
                         <div class="button-wrapper">
-                            <button id="setting_initial_button">적용</button>
+                            <button id="setting_initial_button" class="disasyncable">적용</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-panel detail-setting">
+                    <span class="panel-title">Detail Setting</span>
+                    <hr>
+                    <div class="control-item">
+                        <span>Delay</span>
+                        <input class="numberic-input" id="delay_sync_input" placeholder="0">
+                    </div>
+                    <div class="control-item">
+                        <div class="button-wrapper">
+                            <button id="setting_detail_button">적용</button>
                         </div>
                     </div>
                 </div>
@@ -38,10 +75,13 @@
                     <span class="panel-title">Basic Controls</span>
                     <hr>
                     <div class="button-wrapper">
-                        <button id="shuffle_button">Shuffle</button>
+                        <button id="shuffle_button" class="disasyncable">Shuffle</button>
                     </div>
                     <div class="button-wrapper">
-                        <button id="play_button">Sort</button>
+                        <button id="play_button" class="disasyncable">Sort</button>
+                    </div>
+                    <div class="button-wrapper">
+                        <button id="stop_button">Stop</button>
                     </div>
                 </div>
                 <div class="setting-panel analyze-panel">
@@ -49,11 +89,19 @@
                     <hr>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">데이터 크기</span>
-                        <span class="panel-desc-value" id="data_num_value">200</span>
+                        <span class="panel-desc-value" id="data_num_value">100</span>
+                    </div>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">Delay</span>
+                        <span class="panel-desc-value" id="delay_value">0ms</span>
                     </div>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">Sort Method</span>
                         <span class="panel-desc-value" id="sort_method_value">N/A</span>
+                    </div>
+                    <div class="panel-desc-wrapper">
+                        <span class="panel-desc-title">Assign Method</span>
+                        <span class="panel-desc-value" id="assign_method_value">N/A</span>
                     </div>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">Comparisons</span>

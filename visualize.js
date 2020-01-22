@@ -3,7 +3,7 @@ const maxFrequency = 1300;
 const endMotionDuration = 1000;
 const audioContext = new AudioContext();
 
-const advanced = false;
+let advanced = false;
 
 let canvasObject = null;
 let canvasContext = null;
@@ -18,10 +18,14 @@ let adjustPillarWidth = 0;
 let stdIndex = -1;
 
 
-let sampleSize = 200;
+let sampleSize = 100;
+let sortDelay = 0;
 let sortMethod = "bubble";
+let assignMethod = "sorted";
 let comparisons = 0;
 let arrayAccess = 0;
+
+let sortingProcess = null;
 
 $(function(){
     canvasObject = document.getElementById("viz_canvas");
@@ -37,15 +41,35 @@ $(function(){
 
     $('#setting_initial_button').on("click", function(){
         let dataLen = parseInt($('#data_num_input').val());
+        let delayVal = parseInt($('#delay_input').val());
         let selectedSortMethod = $('#sort_method_selector option:selected').val();
+        let advancedMode = $('#check_compare_switcher').hasClass("active");
+        let selectedAssignMethod = $('#assign_method_selector option:selected').val();
 
-        sampleSize = dataLen;
+        if(isNaN(dataLen) || dataLen <= 0) sampleSize = 100;
+        else sampleSize = dataLen;
         sortMethod = selectedSortMethod;
+        assignMethod = selectedAssignMethod;
+        if(isNaN(delayVal) || delayVal < 0) sortDelay = 0;
+        else sortDelay = delayVal;
+        advanced = advancedMode;
 
-        $('#data_num_value').text(dataLen);
+        $('#data_num_value').text(sampleSize);
         $('#sort_method_value').text(sortMethod);
+        $('#delay_value').text(sortDelay+"ms");
+        $('#assign_method_value').text(assignMethod);
 
         init();
+    });
+
+    $('#setting_detail_button').on("click", function(){
+        let delayVal = parseInt($('#delay_sync_input').val());
+
+        if(isNaN(delayVal) || delayVal < 0) sortDelay = 0;
+        else sortDelay = delayVal;
+
+        
+        $('#delay_value').text(sortDelay);
     });
 
     $('#shuffle_button').on("click", function(){
@@ -54,79 +78,135 @@ $(function(){
     });
 
     $('#play_button').on("click", function(){
-        sort();
+        sortingProcess = cancelableSortFunc();
     });
 
-    // for(let i=0;i<sampleSize;i++){
-    //     setTimeout(function(){
-    //         beep(0.5, i, 30);
-    //         console.log(i);
-    //     }, i*30);
-    // }
+    $('#stop_button').on("click", function(){
+    });
+
+    let toggler = document.querySelector('.toggle-switch');
+    toggler.onclick = function(){
+        toggler.classList.toggle('active');
+    }
 });
 
-async function sort(){
-    const startIndex = 0;
-    const endIndex = sampleSize-1;
-    const size = sampleSize;
+let cancelableSortFunc = async function sort(){
+    try{
+        sortStartCall();
 
-    switch(sortMethod){
-        case "bubble":
-            for(let i=endIndex; i>0; i--){
-                for(let j=0; j<i; j++){
-                    if(bigger(j,j+1))swapBundle(j, j+1);
+        const startIndex = 0;
+        const endIndex = sampleSize-1;
+        const size = sampleSize;
+
+        switch(sortMethod){
+            case "bubble":
+                for(let i=endIndex; i>0; i--){
+                    for(let j=0; j<i; j++){
+                        if(bigger(j,j+1))swapBundle(j, j+1);
+                        
+                        if(j == i-1) longBeep(j+1);
+                        else smallBeep(j);
+                        
+                        stdIndex = j+1;
+                        simpleDraw(j, j+1);
+
+                        await sleep();
+                    }
+                }
+                break;
+            case "selection":
+                let min;
+                for(let i=startIndex; i<endIndex; i++){
+                    min = i;
+
+                    for(let j=i+1; j<size; j++){
+                        if(bigger(min, j)) min = j;
+                    }
+
+                    if(i != min){
+                        swapBundle(i, min);
+
+                        longBeep(i);
+
+                        stdIndex = i;
+                        simpleDraw(i, min);
+
+                        await sleep();
+                    }
+                }
+                break;
+            case "quick":
+                await quickSort(startIndex, endIndex);
+                break;
+            case "bogo":
+                while(true){
+                    let ran = getLowerRandom(size);
+                    let ran2 = getLowerRandom(size);
+                    swapBundle(ran, ran2);
+
+                    stdIndex = ran;
+                    longBeep(ran);
+                    simpleDraw(ran, ran2);
+
+                    await sleep();
+
+                    let correct = true;
+                    for(let i=startIndex; i<endIndex; i++){
+                        if(get(i)>get(i+1)){
+                            correct = false;
+                            break;
+                        }
+                    }
                     
-                    if(j == i-1) longBeep(j+1);
-                    else smallBeep(j);
+                    if(correct)break;
+                }
+                break;
+            case "advanced_bogo":
+                while(true){
+                    let ran = getLowerRandom(size);
+                    let ran2 = getLowerRandom(size);
+
+                    let isMeaningless = pigger(ran2,ran) === bigger(ran2,ran);
+                    if(isMeaningless)continue;
+                    swapBundle(ran, ran2);
+
+                    stdIndex = ran;
+                    longBeep(ran);
+                    simpleDraw(ran, ran2);
+
+                    await sleep();
+
+                    let correct = true;
+                    for(let i=startIndex; i<endIndex; i++){
+                        if(get(i)>get(i+1)){
+                            correct = false;
+                            break;
+                        }
+                    }
                     
-                    stdIndex = j+1;
-                    simpleDraw(j, j+1);
-
-                    await callDraw(0);
+                    if(correct)break;
                 }
-            }
-            break;
-        case "selection":
-            let min;
-            for(let i=startIndex; i<endIndex; i++){
-                min = i;
-
-                for(let j=i+1; j<size; j++){
-                    if(bigger(min, j)) min = j;
-                }
-
-                if(i != min){
-                    swapBundle(i, min);
-
-                    longBeep(i);
-
-                    stdIndex = i;
-                    simpleDraw(i, min);
-
-                    await callDraw(0);
-                }
-            }
-            break;
-        case "quick":
-            await quickSort(startIndex, endIndex);
-            break;
-    }
-
-    let eachDuration = endMotionDuration / sampleSize;
-
-    if(sampleSize > (maxFrequency - minFrequency)){
-        for(let i=minFrequency;i<maxFrequency;i++){
-            setTimeout(function(){
-                beepWithFreq(1.5, i, 1);
-            }, i*1);
+                break;
         }
-    }else{
-        for(let i=0;i<sampleSize;i++){
-            setTimeout(function(){
-                beep(0.7, i, eachDuration*10);
-                drawPillar(i, "#27ff1c");
-            }, i*eachDuration);
+
+        let eachDuration = endMotionDuration / sampleSize;
+
+        if(sampleSize > (maxFrequency - minFrequency)){
+            for(let i=minFrequency;i<maxFrequency;i++){
+                setTimeout(function(){
+                    beepWithFreq(1.5, i, 1);
+                }, i*1);
+            }
+        }else{
+            for(let i=0;i<sampleSize;i++){
+                setTimeout(function(){
+                    beep(0.7, i, eachDuration*5);
+                    drawPillar(i, "#27ff1c");
+                }, i*eachDuration);
+            }
         }
+    }finally{
+        sortEndCall();
     }
 }
 
@@ -159,7 +239,7 @@ async function quickSort_partition(left, right){
             stdIndex = low;
             generalBeep(low);
             simpleDraw(low, high);
-            await callDraw(0);
+            await sleep();
         }
     }while(low<high);
     
@@ -168,9 +248,17 @@ async function quickSort_partition(left, right){
     stdIndex = left;
     generalBeep(left);
     simpleDraw(left, high);
-    await callDraw(0);
+    await sleep();
 
     return high;
+}
+
+function sortStartCall(){
+    $('.disasyncable').attr('disabled', true);
+}
+
+function sortEndCall(){
+    $('.disasyncable').attr('disabled', false);
 }
 
 function compare(){
@@ -183,8 +271,8 @@ function memoryAccess(){
     setAccess(access);
 }
 
-function callDraw(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(){
+    return new Promise(resolve => setTimeout(resolve, sortDelay));
 }
 
 function get(i){
@@ -233,7 +321,21 @@ function simpleDraw(m, n){
 function assign(){
     maxValue = 0;
     for(let i=0; i<sampleSize;i++){
-        let nextValue = i + 1;
+        let nextValue = 0;
+        switch(assignMethod){
+            case "sorted":
+                nextValue = i+1;
+                break;
+            case "reversed":
+                nextValue = sampleSize-i;
+                break;
+            case "sin_wave":
+                nextValue = 100 + 100*Math.sin(6.3*i/sampleSize);
+                break;
+            case "randomly":
+                nextValue = getLowerRandom(sampleSize);
+                break;
+        }
         valueBundle[i] = nextValue;
         colorTouched[i] = false;
         if(maxValue < nextValue) maxValue = nextValue;
