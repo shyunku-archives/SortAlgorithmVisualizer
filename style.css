@@ -41,8 +41,8 @@ body{
 }
 
 .panel-title{
-    font-size: 28px;
-    font-weight: 500;
+    font-size: 25px;
+    font-weight: 600;
 }
 
 .control-item{
@@ -61,9 +61,41 @@ body{
 }
 
 .control-item select{
+    font-family: inherit;
+    max-width: 140px;
+    min-width: 80px;
     float: right;
-    width: 120px;
     height: 22px;
+}
+
+.control-item input[type="range"]{
+    font-family: inherit;
+    width: 120px;
+    height: 5px;
+}
+
+.slider{
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    background-color: rgb(145, 145, 145);
+    margin-top: 10px;
+}
+
+.slider::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    transition: box-shadow 200ms ease-in-out;
+}
+
+.slider::-webkit-slider-thumb:hover{
+    box-shadow: 0 0 5px 5px rgba(6, 255, 27, 0.267);
+    transition: box-shadow 200ms ease-in-out;
 }
 
 .setting-panel .button-wrapper{

@@ -19,11 +19,23 @@
                     <hr>
                     <div class="control-item">
                         <span>데이터 수</span>
-                        <input class="numberic-input" id="data_num_input" placeholder="100">
+                        <span id="data_size">(100)</span>
+                        <input type="range" min="0" max="10" value="4" class="slider" id="datanum_slider">
                     </div>
                     <div class="control-item">
                         <span>Initial Delay</span>
-                        <input class="numberic-input" id="delay_input" placeholder="0">
+                        <select id="initial_delay_selector">
+                            <option value=0>0ms</option>
+                            <option value=2>2ms</option>
+                            <option value=5>5ms</option>
+                            <option value=10>10ms</option>
+                            <option value=20>20ms</option>
+                            <option value=50>50ms</option>
+                            <option value=100>100ms</option>
+                            <option value=200>200ms</option>
+                            <option value=500>500ms</option>
+                            <option value=1000>1000ms</option>
+                        </select>
                     </div>
                     <div class="control-item">
                         <span>Check Compare/Access</span>
@@ -40,7 +52,9 @@
                             <option value="selection">SelectionSort</option>
                             <option value="quick">QuickSort</option>
                             <option value="bogo">BogoSort</option>
-                            <option value="advanced_bogo">AdvancedBogoSort</option>
+                            <option value="advanced_bogo">AdvancedBogoSort*</option>
+                            <option value="min_max">MinMaxSort*</option>
+                            <option value="parallel">ParallelSort*</option>
                         </select>
                     </div>
                     <div class="control-item">
@@ -48,7 +62,9 @@
                         <select id="assign_method_selector">
                             <option value="sorted">Sorted</option>
                             <option value="reversed">Reversed</option>
+                            <option value="v_type">V-Type</option>
                             <option value="sin_wave">SineWave</option>
+                            <option value="exponential">Exponential</option>
                             <option value="randomly">Randomly</option>
                         </select>
                     </div>
@@ -63,12 +79,23 @@
                     <hr>
                     <div class="control-item">
                         <span>Delay</span>
-                        <input class="numberic-input" id="delay_sync_input" placeholder="0">
+                        <select id="current_delay_selector">
+                            <option value=0>0ms</option>
+                            <option value=2>2ms</option>
+                            <option value=5>5ms</option>
+                            <option value=10>10ms</option>
+                            <option value=20>20ms</option>
+                            <option value=50>50ms</option>
+                            <option value=100>100ms</option>
+                            <option value=200>200ms</option>
+                            <option value=500>500ms</option>
+                            <option value=1000>1000ms</option>
+                        </select>
                     </div>
                     <div class="control-item">
-                        <div class="button-wrapper">
-                            <button id="setting_detail_button">적용</button>
-                        </div>
+                        <span>Volume</span>
+                        <span id="current_volume">(5%)</span>
+                        <input type="range" min="0" max="100" value="5" class="slider" id="volume_slider">
                     </div>
                 </div>
                 <div class="setting-panel basic-functions">
@@ -81,7 +108,7 @@
                         <button id="play_button" class="disasyncable">Sort</button>
                     </div>
                     <div class="button-wrapper">
-                        <button id="stop_button">Stop</button>
+                        <button id="stop_button">Stop(Reload)</button>
                     </div>
                 </div>
                 <div class="setting-panel analyze-panel">
@@ -97,11 +124,11 @@
                     </div>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">Sort Method</span>
-                        <span class="panel-desc-value" id="sort_method_value">N/A</span>
+                        <span class="panel-desc-value" id="sort_method_value">bubble</span>
                     </div>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">Assign Method</span>
-                        <span class="panel-desc-value" id="assign_method_value">N/A</span>
+                        <span class="panel-desc-value" id="assign_method_value">sorted</span>
                     </div>
                     <div class="panel-desc-wrapper">
                         <span class="panel-desc-title">Comparisons</span>

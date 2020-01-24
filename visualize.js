@@ -24,8 +24,12 @@ let sortMethod = "bubble";
 let assignMethod = "sorted";
 let comparisons = 0;
 let arrayAccess = 0;
+let finalVolume = 5;
 
-let sortingProcess = null;
+// $(window).resize(function(){
+//     canvasObject.width = canvasWrapper.width();
+//     canvasObject.height = canvasWrapper.height();
+// });
 
 $(function(){
     canvasObject = document.getElementById("viz_canvas");
@@ -40,18 +44,17 @@ $(function(){
     init();
 
     $('#setting_initial_button').on("click", function(){
-        let dataLen = parseInt($('#data_num_input').val());
-        let delayVal = parseInt($('#delay_input').val());
+        let dataLen = parseInt($('#datanum_slider').val());
+        let delayVal = $('#initial_delay_selector option:selected').val();
         let selectedSortMethod = $('#sort_method_selector option:selected').val();
         let advancedMode = $('#check_compare_switcher').hasClass("active");
         let selectedAssignMethod = $('#assign_method_selector option:selected').val();
 
-        if(isNaN(dataLen) || dataLen <= 0) sampleSize = 100;
-        else sampleSize = dataLen;
+        let datasize = exponentialDatanumLevel(dataLen);
+        sampleSize = datasize;
         sortMethod = selectedSortMethod;
         assignMethod = selectedAssignMethod;
-        if(isNaN(delayVal) || delayVal < 0) sortDelay = 0;
-        else sortDelay = delayVal;
+        sortDelay = delayVal;
         advanced = advancedMode;
 
         $('#data_num_value').text(sampleSize);
@@ -62,14 +65,16 @@ $(function(){
         init();
     });
 
-    $('#setting_detail_button').on("click", function(){
-        let delayVal = parseInt($('#delay_sync_input').val());
-
-        if(isNaN(delayVal) || delayVal < 0) sortDelay = 0;
-        else sortDelay = delayVal;
-
+    $('#current_delay_selector').on("change", function(){
+        let delayVal = $('#current_delay_selector option:selected').val();
+        sortDelay = delayVal;
         
         $('#delay_value').text(sortDelay);
+    });
+
+    $('#datanum_slider').on("input", function(){
+        let datasize = exponentialDatanumLevel($(this).val());
+        $('#data_size').text(`(${datasize})`);
     });
 
     $('#shuffle_button').on("click", function(){
@@ -78,10 +83,16 @@ $(function(){
     });
 
     $('#play_button').on("click", function(){
-        sortingProcess = cancelableSortFunc();
+        sort();
     });
 
     $('#stop_button').on("click", function(){
+        location.reload();
+    });
+
+    $('#volume_slider').on("input", function(){
+        finalVolume = $(this).val();
+        $('#current_volume').text(`(${finalVolume}%)`);
     });
 
     let toggler = document.querySelector('.toggle-switch');
@@ -90,7 +101,7 @@ $(function(){
     }
 });
 
-let cancelableSortFunc = async function sort(){
+async function sort(){
     try{
         sortStartCall();
 
@@ -102,16 +113,10 @@ let cancelableSortFunc = async function sort(){
             case "bubble":
                 for(let i=endIndex; i>0; i--){
                     for(let j=0; j<i; j++){
-                        if(bigger(j,j+1))swapBundle(j, j+1);
-                        
-                        if(j == i-1) longBeep(j+1);
-                        else smallBeep(j);
-                        
-                        stdIndex = j+1;
-                        simpleDraw(j, j+1);
-
-                        await sleep();
+                        if(bigger(j,j+1))await swapBundle(j+1, j);
+                        await drawStd(j+1);
                     }
+                    longBeep(i);
                 }
                 break;
             case "selection":
@@ -121,17 +126,12 @@ let cancelableSortFunc = async function sort(){
 
                     for(let j=i+1; j<size; j++){
                         if(bigger(min, j)) min = j;
+                        await drawStd(j);
                     }
 
                     if(i != min){
-                        swapBundle(i, min);
-
-                        longBeep(i);
-
+                        await swapBundle(min, i);
                         stdIndex = i;
-                        simpleDraw(i, min);
-
-                        await sleep();
                     }
                 }
                 break;
@@ -142,13 +142,10 @@ let cancelableSortFunc = async function sort(){
                 while(true){
                     let ran = getLowerRandom(size);
                     let ran2 = getLowerRandom(size);
-                    swapBundle(ran, ran2);
 
                     stdIndex = ran;
                     longBeep(ran);
-                    simpleDraw(ran, ran2);
-
-                    await sleep();
+                    await swapBundle(ran, ran2);
 
                     let correct = true;
                     for(let i=startIndex; i<endIndex; i++){
@@ -168,13 +165,10 @@ let cancelableSortFunc = async function sort(){
 
                     let isMeaningless = pigger(ran2,ran) === bigger(ran2,ran);
                     if(isMeaningless)continue;
-                    swapBundle(ran, ran2);
 
                     stdIndex = ran;
                     longBeep(ran);
-                    simpleDraw(ran, ran2);
-
-                    await sleep();
+                    await swapBundle(ran, ran2);
 
                     let correct = true;
                     for(let i=startIndex; i<endIndex; i++){
@@ -187,20 +181,75 @@ let cancelableSortFunc = async function sort(){
                     if(correct)break;
                 }
                 break;
+            case "min_max":
+                let left = startIndex;
+                let right = endIndex;
+                while(true){
+                    if(left>=right)break;
+                    let max = 0, maxInd = -1;
+                    for(let i=left;i<=right;i++){
+                        if(pigger(get(i), max)){
+                            max = get(i);
+                            maxInd = i;
+                            await drawStd(i);
+                        }
+                    }
+                    if(maxInd != -1){
+                        longBeep(right);
+                        await swapBundle(right, maxInd);
+                        right--;
+                    }
+
+                    
+                    if(left>=right)break;                    
+                    let min = maxValue + 1, minInd = -1;
+                    for(let i=right;i>=left;i--){
+                        if(pigger(min, get(i))){
+                            min = get(i);
+                            minInd = i;
+                            await drawStd(i);
+                        }
+                    }
+                    console.log(3);
+                    if(minInd != -1){
+                        longBeep(left);
+                        await swapBundle(left, minInd);
+                        left++;
+                    }
+                }
+                break;
+            case "parallel":
+                for(let bs=size-1;bs>0;bs--){
+                    for(let ls=0;ls<size-bs;ls++){
+                        let rs = ls + bs;
+
+                        await drawStds([ls, rs]);
+
+                        if(bigger(ls, rs)){
+                            longBeep(ls);
+                            await swapBundle(ls, rs);
+                        }
+                    }
+                }
         }
 
         let eachDuration = endMotionDuration / sampleSize;
 
         if(sampleSize > (maxFrequency - minFrequency)){
+            for(let i=0;i<sampleSize;i++){
+                setTimeout(function(){
+                    drawPillar(i, "#27ff1c");
+                }, i*eachDuration);
+            }
             for(let i=minFrequency;i<maxFrequency;i++){
                 setTimeout(function(){
-                    beepWithFreq(1.5, i, 1);
+                    beepWithFreq(10, i, 1);
                 }, i*1);
             }
         }else{
             for(let i=0;i<sampleSize;i++){
                 setTimeout(function(){
-                    beep(0.7, i, eachDuration*5);
+                    beep(7, i, eachDuration*5);
                     drawPillar(i, "#27ff1c");
                 }, i*eachDuration);
             }
@@ -211,6 +260,7 @@ let cancelableSortFunc = async function sort(){
 }
 
 //sort functions
+
 async function quickSort(left, right){
     if(left<right){
         let part = await quickSort_partition(left, right);
@@ -234,23 +284,54 @@ async function quickSort_partition(left, right){
         }while(pigger(high, left-1) && pigger(get(high), pivot));
 
         if(low<high){
-            swapBundle(low, high);
-
+            await drawColorStds([low, high], "orange");
+            await swapBundle(low, high);
             stdIndex = low;
-            generalBeep(low);
-            simpleDraw(low, high);
-            await sleep();
         }
     }while(low<high);
-    
-    swapBundle(left, high);
 
-    stdIndex = left;
     generalBeep(left);
-    simpleDraw(left, high);
-    await sleep();
+    await swapBundle(left, high);
 
     return high;
+}
+
+// user function
+
+async function drawStd(index){
+    redrawPillar();
+    drawPillar(index, "red");
+    smallBeep(index);
+
+    await sleep();
+}
+
+async function drawColorStd(index, color){
+    redrawPillar();
+    drawPillar(index, color);
+    smallBeep(index);
+
+    await sleep();
+}
+
+async function drawStds(inds){
+    redrawPillar();
+    for(let i=0;i<inds.length;i++){
+        drawPillar(inds[i], "red");
+        smallBeep(inds[i]);
+    }
+
+    await sleep();
+}
+
+async function drawColorStds(inds, color){
+    redrawPillar();
+    for(let i=0;i<inds.length;i++){
+        drawPillar(inds[i], color);
+        smallBeep(inds[i]);
+    }
+
+    await sleep();
 }
 
 function sortStartCall(){
@@ -299,14 +380,9 @@ function draw(){
     clear();
     canvasContext.fillStyle = "white";
     for(let i=0; i<sampleSize;i++){
-        drawPillar(i);
+        drawPillar(i, "white");
     }
 }
-
-// function revalidatePrevPillar(){
-//     erasePillar(prevIndex);
-//     drawPillar(prevIndex);
-// }
 
 function simpleDraw(m, n){
     redrawPillar();
@@ -329,8 +405,14 @@ function assign(){
             case "reversed":
                 nextValue = sampleSize-i;
                 break;
+            case "v_type":
+                nextValue = i<sampleSize/2?(sampleSize-2*i):(2*(i-sampleSize/2)+1);
+                break;
             case "sin_wave":
-                nextValue = 100 + 100*Math.sin(6.3*i/sampleSize);
+                nextValue = 100 + 100*Math.sin(2*Math.PI*i/sampleSize);
+                break;
+            case "exponential":
+                nextValue = 1 + Math.pow(1.05, i);
                 break;
             case "randomly":
                 nextValue = getLowerRandom(sampleSize);
@@ -345,7 +427,7 @@ function assign(){
 function shuffle(){
     for(let i=0; i<sampleSize;i++){
         let swapIndex = getLowerRandom(sampleSize);
-        swapBundle(i, swapIndex);
+        pureSwapBundle(i, swapIndex);
     }
 }
 
@@ -361,19 +443,19 @@ function redrawPillar(){
 function erasePillar(index){
     canvasContext.fillStyle = "black";
     let centerPos = adjustPillarWidth*(index+0.5);
-    let pillarWidth = adjustPillarWidth;
+    let pillarWidth = adjustPillarWidth+1;
     let pillarX = centerPos - pillarWidth / 2;
-    canvasContext.fillRect(pillarX, 0, pillarWidth, canvasHeight);
+    canvasContext.fillRect(Math.round(pillarX), 0, Math.round(pillarWidth), canvasHeight);
 }
 
 function drawPillar(index, color){
     canvasContext.fillStyle = color;
     
-    let pillarWidth = adjustPillarWidth;
+    let pillarWidth = adjustPillarWidth+1;
 
-    if(color == "red") {
+    if((color != "white") && (color != "black")) {
         colorTouched.push(index);
-        pillarWidth = adjustPillarWidth*0.9;
+        // pillarWidth = adjustPillarWidth*0.9;
     }
 
     let centerPos = adjustPillarWidth*(index+0.5);
@@ -381,7 +463,7 @@ function drawPillar(index, color){
     let pillarHeight = canvasHeight * valueBundle[index] / maxValue;
     let pillarX = centerPos - pillarWidth / 2;
     let pillarY = canvasHeight - pillarHeight;
-    canvasContext.fillRect(pillarX, pillarY, pillarWidth, pillarHeight);
+    canvasContext.fillRect(Math.round(pillarX), pillarY, Math.round(pillarWidth), pillarHeight);
 }
 
 function bigger(x, y){
@@ -394,11 +476,20 @@ function pigger(x, y){
     return x > y;
 }
 
-function swapBundle(x, y){
+function pureSwapBundle(x, y){
+    let tmp = valueBundle[x];
+    valueBundle[x] = valueBundle[y];
+    valueBundle[y] = tmp;
+}
+
+async function swapBundle(x, y){
     let tmp = valueBundle[x];
     valueBundle[x] = valueBundle[y];
     valueBundle[y] = tmp;
     if(advanced) memoryAccess();
+    simpleDraw(x, y);
+    generalBeep(y);
+    await sleep();
 }
 
 function getRandom(min, max){
@@ -412,31 +503,22 @@ function getLowerRandom(max){
 }
 
 function smallBeep(index){
-    beep(0.3, index, 20);
+    beep(3, index, 20);
 }
 
 function generalBeep(index){
-    beep(1, index, 20);
+    beep(10, index, 20);
 }
 
 function longBeep(index){
-    beep(1, index, 40);
+    beep(10, index, 40);
 }
 
 function beep(vol, index, duration){
     let frequencyInterval = maxFrequency - minFrequency;
     let freq = parseInt(minFrequency + (frequencyInterval * valueBundle[index] / maxValue));
-    let oscil = audioContext.createOscillator();
-    let rgain = audioContext.createGain();
 
-    oscil.connect(rgain);
-    oscil.frequency.value = freq;
-    oscil.type="square";
-
-    rgain.connect(audioContext.destination);
-    rgain.gain.value = vol*0.01;
-    oscil.start(audioContext.currentTime);
-    oscil.stop(audioContext.currentTime + duration*0.001);
+    beepWithFreq(vol, freq, duration);
 }
 
 function beepWithFreq(vol, freq, duration){
@@ -448,7 +530,7 @@ function beepWithFreq(vol, freq, duration){
     oscil.type="square";
 
     rgain.connect(audioContext.destination);
-    rgain.gain.value = vol*0.01;
+    rgain.gain.value = vol*0.01*finalVolume*0.01;
     oscil.start(audioContext.currentTime);
     oscil.stop(audioContext.currentTime + duration*0.001);
 }
