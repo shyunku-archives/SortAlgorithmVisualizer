@@ -1,3 +1,8 @@
 # VisualizeSortAlgorithm
 ## Project Description
-이 프로젝트는 Sorting Algorithms를 시각화하기 위해 만들어진 웹 페이지 형식 툴입니다.
+This project is web-page formed tool which is made to visualize sorting algorithms.\
+The proper method to stop sorting process doesn't exist yet, but you can refresh page with clicking "Stop" button.
+
+## Usage
+You can use this tool with just floating index.html on browers.\
+Chrome Brower is recommended.
