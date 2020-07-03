@@ -1,31 +1,3 @@
-const minFrequency = 0;
-const maxFrequency = 1300;
-const endMotionDuration = 1000;
-const audioContext = new AudioContext();
-
-let advanced = false;
-
-let canvasObject = null;
-let canvasContext = null;
-let canvasWidth = 0;
-let canvasHeight = 0;
-
-
-let valueBundle = [];
-let colorTouched = [];
-let maxValue = 0;
-let adjustPillarWidth = 0;
-let stdIndex = -1;
-
-
-let sampleSize = 100;
-let sortDelay = 0;
-let sortMethod = "bubble";
-let assignMethod = "sorted";
-let comparisons = 0;
-let arrayAccess = 0;
-let finalVolume = 5;
-
 // $(window).resize(function(){
 //     canvasObject.width = canvasWrapper.width();
 //     canvasObject.height = canvasWrapper.height();
@@ -233,6 +205,18 @@ async function sort(){
                         }
                     }
                 }
+                break;
+            case "foolshaker":
+                do{
+                    await foolshakerSort(startIndex, endIndex);
+                }while(!certify())
+                break;
+            case "factory":
+                let tries = 0;
+                do{
+                    await factorySort(startIndex, endIndex, tries++);
+                }while(!certify())
+                break;
         }
 
         let eachDuration = endMotionDuration / sampleSize;
@@ -262,6 +246,96 @@ async function sort(){
 }
 
 //sort functions
+
+async function factorySort(left, right, tries){
+    if(left<right){
+        let mid = parseInt((left + right)/2);
+        let lmax = MIN_LIMIT;
+        let rmin = MAX_LIMIT;
+        let lmaxInd = -1, rminInd = -1;
+        for(let i=left;i<=mid;i++){
+            if(lmax < get(i)){
+                lmax = get(i);
+                lmaxInd = i;
+            }
+            compare();
+            await drawStd(i);
+        }
+        for(let i=right;i>=mid+1;i--){
+            if(rmin > get(i)){
+                rmin = get(i);
+                rminInd = i;
+            }
+            compare();
+            await drawStd(i);
+        }
+
+        if(lmax > rmin){
+            await swapBundle(lmaxInd, rminInd);
+        }
+
+        if(tries%2==0){
+            await factorySort(mid+1, right);
+            await factorySort(left, mid);
+        }else{
+            await factorySort(left, mid);
+            await factorySort(mid+1, right);
+        }
+    }
+}
+
+async function foolshakerSort(left, right){
+    if(left<right){
+        //console.log(left+", "+right);
+        let mid = parseInt((left + right)/2);
+        //left~mid - mid+1~right
+        let leftSum = 0, rightSum = 0;
+        for(let i=left;i<=mid;i++){
+            leftSum += get(i);
+            await drawStd(i);
+        }
+        for(let i=right;i>=mid+1;i--){
+            rightSum += get(i);
+            await drawStd(i);
+        }
+        let leftAvg = leftSum / (mid-left+1);
+        let rightAvg = rightSum / (right-mid);
+        if(leftAvg > rightAvg){
+            for(let i=left,j=right; i<=mid&&j>=mid+1;i++,j--){
+                if(bigger(i,j)){
+                    stdIndex = j;
+                    longBeep(j);
+                    await swapBundle(i, j);
+                }
+            }
+        }else{
+            let lmax = MIN_LIMIT;
+            let rmin = MAX_LIMIT;
+            let lmaxInd = -1, rminInd = -1;
+            for(let i=left;i<=mid;i++){
+                if(lmax < get(i)){
+                    lmax = get(i);
+                    lmaxInd = i;
+                }
+                await drawStd(i);
+            }
+            for(let i=right;i>=mid+1;i--){
+                if(rmin > get(i)){
+                    rmin = get(i);
+                    rminInd = i;
+                }
+                await drawStd(i);
+            }
+
+            if(lmax > rmin){
+                await swapBundle(lmaxInd, rminInd);
+            }
+        }
+
+        await foolshakerSort(mid+1, right);
+        await foolshakerSort(left, mid);
+    }
+}
 
 async function quickSort(left, right){
     if(left<right){
