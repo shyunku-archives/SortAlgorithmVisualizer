@@ -34,12 +34,14 @@ let finalVolume = 5;
 $(function(){
     canvasObject = document.getElementById("viz_canvas");
     canvasWrapper = $('#viz_canvas_wrapper');
-    canvasObject.width = canvasWrapper.width();
-    canvasObject.height = canvasWrapper.height();
-    canvasWidth = canvasObject.width;
-    canvasHeight = canvasObject.height;
+    resize();
     canvasContext = canvasObject.getContext("2d");
     canvasContext.imageSmoothingEnabled = false;
+
+    $(window).on("resize", function(){
+        resize();
+        init();
+    });
 
     init();
 
@@ -533,4 +535,11 @@ function beepWithFreq(vol, freq, duration){
     rgain.gain.value = vol*0.01*finalVolume*0.01;
     oscil.start(audioContext.currentTime);
     oscil.stop(audioContext.currentTime + duration*0.001);
+}
+
+function resize(){
+    canvasObject.width = canvasWrapper.width();
+    canvasObject.height = canvasWrapper.height();
+    canvasWidth = canvasObject.width;
+    canvasHeight = canvasObject.height;
 }
