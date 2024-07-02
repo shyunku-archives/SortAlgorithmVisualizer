@@ -1,150 +1,156 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>visualize</title>
-        <link rel="stylesheet" href="style.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="functions.js"></script>
-        <script src="visualize.js"></script>
-        <script src="sort.js"></script>
-        <script src="util.js"></script>
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet">
-    </head>
-    <body>
-        <div class="entire-wrapper">
-            <div class="left-part" id="viz_canvas_wrapper">
-                <canvas id="viz_canvas"></canvas>
+  <head>
+    <title>visualize</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="functions.js"></script>
+    <script src="visualize.js"></script>
+    <script src="sort.js"></script>
+    <script src="util.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="entire-wrapper">
+      <div class="left-part" id="viz_canvas_wrapper">
+        <canvas id="viz_canvas"></canvas>
+      </div>
+      <div class="right-part">
+        <div class="setting-panel initial-setting">
+          <span class="panel-title">Initial Setting</span>
+          <hr />
+          <div class="control-item">
+            <span>데이터 수</span>
+            <span id="data_size">(100)</span>
+            <input type="range" min="0" max="13" value="4" class="slider" id="datanum_slider" />
+          </div>
+          <div class="control-item">
+            <span>Initial Delay</span>
+            <select id="initial_delay_selector">
+              <option value="0">0ms</option>
+              <option value="2">2ms</option>
+              <option value="5">5ms</option>
+              <option value="10">10ms</option>
+              <option value="20">20ms</option>
+              <option value="50">50ms</option>
+              <option value="100">100ms</option>
+              <option value="200">200ms</option>
+              <option value="500">500ms</option>
+              <option value="1000">1000ms</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <span>Check Compare/Access</span>
+            <div class="switcher">
+              <span class="toggle-switch" id="check_compare_switcher">
+                <span class="toggle-knob"></span>
+              </span>
             </div>
-            <div class="right-part">
-                <div class="setting-panel initial-setting">
-                    <span class="panel-title">Initial Setting</span>
-                    <hr>
-                    <div class="control-item">
-                        <span>데이터 수</span>
-                        <span id="data_size">(100)</span>
-                        <input type="range" min="0" max="10" value="4" class="slider" id="datanum_slider">
-                    </div>
-                    <div class="control-item">
-                        <span>Initial Delay</span>
-                        <select id="initial_delay_selector">
-                            <option value=0>0ms</option>
-                            <option value=2>2ms</option>
-                            <option value=5>5ms</option>
-                            <option value=10>10ms</option>
-                            <option value=20>20ms</option>
-                            <option value=50>50ms</option>
-                            <option value=100>100ms</option>
-                            <option value=200>200ms</option>
-                            <option value=500>500ms</option>
-                            <option value=1000>1000ms</option>
-                        </select>
-                    </div>
-                    <div class="control-item">
-                        <span>Check Compare/Access</span>
-                        <div class="switcher">
-                            <span class="toggle-switch" id="check_compare_switcher">
-                                <span class="toggle-knob"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="control-item">
-                        <span>Sort Method</span>
-                        <select id="sort_method_selector">
-                            <option value="bubble">BubbleSort</option>
-                            <option value="selection">SelectionSort</option>
-                            <option value="quick">QuickSort</option>
-                            <option value="radix">RadixSort</option>
-                            <option value="bogo">BogoSort</option>
-                            <option value="advanced_bogo">AdvancedBogoSort*</option>
-                            <option value="min_max">MinMaxSort*</option>
-                            <option value="parallel">ParallelSort*</option>
-                            <option value="foolshaker">FoolShakerSort*</option>
-                            <option value="factory">FactorySort*</option>
-                        </select>
-                    </div>
-                    <div class="control-item">
-                        <span>Assign Method</span>
-                        <select id="assign_method_selector">
-                            <option value="sorted">Sorted</option>
-                            <option value="reversed">Reversed</option>
-                            <option value="v_type">V-Type</option>
-                            <option value="sin_wave">SineWave</option>
-                            <option value="exponential">Exponential</option>
-                            <option value="randomly">Randomly</option>
-                        </select>
-                    </div>
-                    <div class="control-item">
-                        <div class="button-wrapper">
-                            <button id="setting_initial_button" class="disasyncable">적용</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="setting-panel detail-setting">
-                    <span class="panel-title">Detail Setting</span>
-                    <hr>
-                    <div class="control-item">
-                        <span>Delay</span>
-                        <select id="current_delay_selector">
-                            <option value=0>0ms</option>
-                            <option value=2>2ms</option>
-                            <option value=5>5ms</option>
-                            <option value=10>10ms</option>
-                            <option value=20>20ms</option>
-                            <option value=50>50ms</option>
-                            <option value=100>100ms</option>
-                            <option value=200>200ms</option>
-                            <option value=500>500ms</option>
-                            <option value=1000>1000ms</option>
-                        </select>
-                    </div>
-                    <div class="control-item">
-                        <span>Volume</span>
-                        <span id="current_volume">(5%)</span>
-                        <input type="range" min="0" max="100" value="5" class="slider" id="volume_slider">
-                    </div>
-                </div>
-                <div class="setting-panel basic-functions">
-                    <span class="panel-title">Basic Controls</span>
-                    <hr>
-                    <div class="button-wrapper">
-                        <button id="shuffle_button" class="disasyncable">Shuffle</button>
-                    </div>
-                    <div class="button-wrapper">
-                        <button id="play_button" class="disasyncable">Sort</button>
-                    </div>
-                    <div class="button-wrapper">
-                        <button id="stop_button">Stop(Reload)</button>
-                    </div>
-                </div>
-                <div class="setting-panel analyze-panel">
-                    <span class="panel-title">Analyze Panel</span>
-                    <hr>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">데이터 크기</span>
-                        <span class="panel-desc-value" id="data_num_value">100</span>
-                    </div>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">Delay</span>
-                        <span class="panel-desc-value" id="delay_value">0ms</span>
-                    </div>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">Sort Method</span>
-                        <span class="panel-desc-value" id="sort_method_value">bubble</span>
-                    </div>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">Assign Method</span>
-                        <span class="panel-desc-value" id="assign_method_value">sorted</span>
-                    </div>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">Comparisons</span>
-                        <span class="panel-desc-value" id="comparison_num_value">0</span>
-                    </div>
-                    <div class="panel-desc-wrapper">
-                        <span class="panel-desc-title">Memory Access</span>
-                        <span class="panel-desc-value" id="memory_access_num_value">0</span>
-                    </div>
-                </div>
+          </div>
+          <div class="control-item">
+            <span>Sort Method</span>
+            <select id="sort_method_selector">
+              <option value="bubble">BubbleSort</option>
+              <!-- <option value="insertion">InsertionSort</option> -->
+              <option value="selection">SelectionSort</option>
+              <option value="quick">QuickSort</option>
+              <option value="merge">MergeSort</option>
+              <option value="heap">HeapSort</option>
+              <option value="radix">RadixSort</option>
+              <option value="counting">CountingSort</option>
+              <!-- <option value="tree">TreeSort</option> -->
+              <!-- <option value="shell">ShellSort</option> -->
+              <option value="bogo">BogoSort</option>
+              <option value="advanced_bogo">AdvancedBogoSort*</option>
+              <option value="min_max">MinMaxSort*</option>
+              <option value="parallel">ParallelSort*</option>
+              <option value="foolshaker">FoolShakerSort*</option>
+              <option value="factory">FactorySort*</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <span>Assign Method</span>
+            <select id="assign_method_selector">
+              <option value="sorted">Sorted</option>
+              <option value="reversed">Reversed</option>
+              <option value="v_type">V-Type</option>
+              <option value="sin_wave">SineWave</option>
+              <option value="exponential">Exponential</option>
+              <option value="randomly">Randomly</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <div class="button-wrapper">
+              <button id="setting_initial_button" class="disasyncable">적용</button>
             </div>
+          </div>
         </div>
-    </body>
+        <div class="setting-panel detail-setting">
+          <span class="panel-title">Detail Setting</span>
+          <hr />
+          <div class="control-item">
+            <span>Delay</span>
+            <select id="current_delay_selector">
+              <option value="0">0ms</option>
+              <option value="2">2ms</option>
+              <option value="5">5ms</option>
+              <option value="10">10ms</option>
+              <option value="20">20ms</option>
+              <option value="50">50ms</option>
+              <option value="100">100ms</option>
+              <option value="200">200ms</option>
+              <option value="500">500ms</option>
+              <option value="1000">1000ms</option>
+            </select>
+          </div>
+          <div class="control-item">
+            <span>Volume</span>
+            <span id="current_volume">(5%)</span>
+            <input type="range" min="0" max="100" value="5" class="slider" id="volume_slider" />
+          </div>
+        </div>
+        <div class="setting-panel basic-functions">
+          <span class="panel-title">Basic Controls</span>
+          <hr />
+          <div class="button-wrapper">
+            <button id="shuffle_button" class="disasyncable">Shuffle</button>
+          </div>
+          <div class="button-wrapper">
+            <button id="play_button" class="disasyncable">Sort</button>
+          </div>
+          <div class="button-wrapper">
+            <button id="stop_button">Stop(Reload)</button>
+          </div>
+        </div>
+        <div class="setting-panel analyze-panel">
+          <span class="panel-title">Analyze Panel</span>
+          <hr />
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">데이터 크기</span>
+            <span class="panel-desc-value" id="data_num_value">100</span>
+          </div>
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">Delay</span>
+            <span class="panel-desc-value" id="delay_value">0ms</span>
+          </div>
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">Sort Method</span>
+            <span class="panel-desc-value" id="sort_method_value">bubble</span>
+          </div>
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">Assign Method</span>
+            <span class="panel-desc-value" id="assign_method_value">sorted</span>
+          </div>
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">Comparisons</span>
+            <span class="panel-desc-value" id="comparison_num_value">0</span>
+          </div>
+          <div class="panel-desc-wrapper">
+            <span class="panel-desc-title">Memory Access</span>
+            <span class="panel-desc-value" id="memory_access_num_value">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
